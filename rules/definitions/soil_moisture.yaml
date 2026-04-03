@@ -1,0 +1,12 @@
+rule_id: DROUGHT_SOIL_VWC
+name: "Soil Moisture Drought Trigger"
+event_type: drought
+data_source: soil_moisture_iot
+condition:
+  metric: vwc_percent
+  operator: "<="
+  threshold: 15.0           # VWC below 15% = severe soil moisture deficit
+  window_days: 3
+  consecutive_days: 3
+payout_tier: tier_3
+active: true

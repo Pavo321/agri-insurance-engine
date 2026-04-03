@@ -1,0 +1,12 @@
+rule_id: FLOOD_RAIN_48H
+name: "Flood Rainfall Trigger"
+event_type: flood
+data_source: imd_weather
+condition:
+  metric: cumulative_rainfall_mm_48h
+  operator: ">="
+  threshold: 200.0          # 200mm in 48 hours = severe flood indicator
+  window_days: 2
+  consecutive_days: 1
+payout_tier: tier_1
+active: true

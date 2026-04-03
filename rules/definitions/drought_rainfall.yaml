@@ -1,0 +1,12 @@
+rule_id: DROUGHT_RAIN_14D
+name: "Rainfall Deficit Drought Trigger"
+event_type: drought
+data_source: imd_weather
+condition:
+  metric: cumulative_rainfall_mm_14d
+  operator: "<="
+  threshold: 20.0           # less than 20mm over 14 days = severe drought
+  window_days: 14
+  consecutive_days: 1
+payout_tier: tier_2
+active: true

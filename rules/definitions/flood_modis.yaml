@@ -1,0 +1,12 @@
+rule_id: FLOOD_MODIS
+name: "NASA MODIS Flood Detection Trigger"
+event_type: flood
+data_source: nasa_modis
+condition:
+  metric: modis_flood
+  operator: ">="
+  threshold: 1.0            # 1 = flood pixel detected on farm polygon
+  window_days: 1
+  consecutive_days: 1
+payout_tier: tier_1
+active: true

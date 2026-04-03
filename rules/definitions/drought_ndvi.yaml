@@ -1,0 +1,12 @@
+rule_id: DROUGHT_NDVI_30
+name: "NDVI Drop Drought Trigger"
+event_type: drought
+data_source: bhuvan_ndvi
+condition:
+  metric: ndvi_change_pct
+  operator: "<="
+  threshold: -0.30          # 30% drop from 30-day rolling baseline
+  window_days: 1
+  consecutive_days: 3       # must persist 3 days — avoids cloud shadow false positives
+payout_tier: tier_2
+active: true
