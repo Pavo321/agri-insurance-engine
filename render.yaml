@@ -1,0 +1,72 @@
+services:
+  # FastAPI backend
+  - type: web
+    name: tranpal-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile.render
+    plan: free
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port 8000
+    envVars:
+      # --- Supabase PostgreSQL (free, includes PostGIS) ---
+      # Sign up at https://supabase.com → New project → Settings → Database
+      # Format: postgresql+asyncpg://<user>:<password>@<host>:5432/<db>
+      - key: POSTGRES_DSN
+        sync: false   # paste in Render dashboard
+
+      # --- Render Redis (free) ---
+      - key: REDIS_URL
+        fromService:
+          name: tranpal-redis
+          type: redis
+          property: connectionString
+
+      # --- API Keys (get from respective portals) ---
+      - key: BHUVAN_API_KEY
+        sync: false
+      - key: IMD_API_TOKEN
+        sync: false
+      - key: NASA_EARTHDATA_TOKEN
+        sync: false
+      - key: FASAL_BIMA_API_KEY
+        sync: false
+      - key: UPI_MERCHANT_ID
+        sync: false
+      - key: UPI_API_KEY
+        sync: false
+      - key: UPI_API_BASE_URL
+        value: "https://api.razorpay.com/v1"
+
+      # --- Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" ---
+      - key: FERNET_ENCRYPTION_KEY
+        sync: false
+
+      # Thresholds (safe defaults, override if needed)
+      - key: MAX_PAYOUT_PER_EVENT_INR
+        value: "25000.0"
+      - key: NDVI_CHANGE_THRESHOLD
+        value: "-0.30"
+      - key: FLOOD_RAINFALL_48H_MM
+        value: "200.0"
+      - key: DROUGHT_RAINFALL_14D_MM
+        value: "20.0"
+      - key: SOIL_VWC_THRESHOLD
+        value: "15.0"
+      - key: PILOT_STATE_CODE
+        value: "MH"
+
+  # Streamlit monitoring dashboard
+  - type: web
+    name: tranpal-dashboard
+    runtime: docker
+    dockerfilePath: ./Dockerfile.render
+    plan: free
+    startCommand: streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0 --server.headless true
+    envVars:
+      - key: POSTGRES_DSN
+        sync: false   # same Supabase DSN as above
+
+  # Redis (Celery broker + idempotency store)
+  - type: redis
+    name: tranpal-redis
+    plan: free
+    maxmemoryPolicy: noeviction
