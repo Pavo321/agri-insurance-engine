@@ -54,10 +54,11 @@ def fetch_latest_ndvi_granules(days_back: int = 20) -> list[dict]:
     )
     url = f"{CMR_URL}?{params}"
 
-    req = urllib.request.Request(url, headers={
-        "Authorization": f"Bearer {_get_token()}",
-        "Accept": "application/json",
-    })
+    headers = {"Accept": "application/json"}
+    token = _get_token()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
 
     with urllib.request.urlopen(req, timeout=20, context=_ssl_ctx()) as r:
         data = json.loads(r.read())

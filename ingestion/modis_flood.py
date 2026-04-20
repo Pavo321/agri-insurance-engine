@@ -58,10 +58,11 @@ def search_modis_granules(product: str, fetch_date: date, bbox: dict) -> list[di
     )
     url = f"{CMR_SEARCH_URL}?{params}"
 
-    req = urllib.request.Request(url, headers={
-        "Authorization": f"Bearer {_get_token()}",
-        "Accept": "application/json",
-    })
+    headers = {"Accept": "application/json"}
+    token = _get_token()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
 
     try:
         with urllib.request.urlopen(req, timeout=30, context=_ssl_context()) as r:
@@ -123,9 +124,11 @@ def download_modis_file(url: str, output_path: Path) -> bool:
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    req = urllib.request.Request(url, headers={
-        "Authorization": f"Bearer {_get_token()}",
-    })
+    headers = {}
+    token = _get_token()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
 
     try:
         with urllib.request.urlopen(req, timeout=120, context=_ssl_context()) as r:
